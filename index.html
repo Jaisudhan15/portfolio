@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Jai Sudhan — Underwater Portfolio (Enhanced)</title>
+<style>
+  :root{
+    --accent:#ffd06b;
+    --text:#e8fbff;
+    --card-bg: rgba(2,18,24,0.72);
+    --card-border: rgba(255,255,255,0.04);
+    --maxW:1200px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:#001627;color:var(--text);-webkit-font-smoothing:antialiased;}
+  canvas#fx{position:fixed;inset:0;z-index:0;display:block;pointer-events:none}
+  .site { position:relative; z-index:10; max-width:var(--maxW); margin:0 auto; padding:1.6rem; }
+  header{position:fixed;left:0;right:0;top:12px;z-index:12;display:flex;justify-content:center;}
+  .nav{background:linear-gradient(180deg, rgba(0,10,15,0.35), rgba(0,10,15,0.08));padding:.6rem 1rem;border-radius:12px;backdrop-filter:blur(6px);display:flex;gap:.8rem;align-items:center;box-shadow:0 10px 30px rgba(2,10,18,0.5)}
+  .nav a{color:var(--text);font-weight:600;padding:.45rem .7rem;border-radius:8px;text-decoration:none;transition:all .22s}
+  .nav a:hover{transform:translateY(-4px);color:var(--accent)}
+  main{position:relative;z-index:11;display:flex;gap:2.2rem;align-items:flex-start;margin-top:8vh;padding:2.6rem;}
+  .left{flex:1}
+  .title{font-size:clamp(2.2rem,4vw,3.6rem);margin-bottom:.6rem;text-shadow:0 6px 22px rgba(0,8,10,0.6)}
+  .lead{font-size:1.05rem;color:#bfe9ff;opacity:.98;margin-bottom:1.2rem;max-width:60ch;text-shadow:0 6px 22px rgba(0,8,10,0.45)}
+  .right{width:360px;min-width:220px;align-self:flex-start}
+  .card{ background:var(--card-bg); padding:1.2rem;border-radius:12px;border:1px solid var(--card-border); box-shadow:0 18px 46px rgba(0,8,12,0.7);backdrop-filter: blur(6px); }
+  .small{font-size:.95rem;color:#cfeff9}
+  .btn{ text-decoration: none; display:inline-block;padding:.7rem 1.2rem;border-radius:999px;border:1px solid rgba(255,208,107,0.08);background:transparent;color:var(--accent);cursor:pointer;font-weight:700;transition:transform .22s}
+  .btn:hover{transform:translateY(-6px)}
+  section{margin-top:2.6rem}
+  footer{color:#8fbfd8;margin-top:2.2rem;font-size:.92rem}
+  .content-card{ background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-radius:10px; padding:1rem; border:1px solid rgba(255,255,255,0.04); color:var(--text); box-shadow: 0 10px 30px rgba(1,12,18,0.6); }
+  .project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+  .project{background:rgba(255,255,255,0.02);padding:1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+  .edu-list{display:flex;flex-direction:column;gap:.6rem;margin-top:.8rem}
+  /* Fix contact form inputs & textarea */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem; /* spacing between fields */
+}
+
+
+
+
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;              /* fill parent width */
+  max-width: 100%;          /* prevent overflow */
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  font-size: 1rem;
+  resize: vertical;         /* allow vertical resize only */
+  box-sizing: border-box;   /* padding included in width */
+}
+
+.contact-form textarea {
+  min-height: 120px;        /* good default size */
+  line-height: 1.4;
+}
+
+  input,textarea{padding:.6rem;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--text)}
+  @media(max-width:900px){main{flex-direction:column;padding:1.4rem} .right{width:100%}}
+  a:focus, button:focus, input:focus, textarea:focus{outline:3px solid rgba(255,208,107,0.12); outline-offset:3px}
+  /* small HUD toggle */
+  #effectsToggle{position:fixed;right:18px;top:18px;z-index:30;background:rgba(0,0,0,0.45);padding:.5rem;border-radius:8px;color:var(--text);font-weight:600;backdrop-filter:blur(6px);cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
+
+  
+  /* --- WAVY BACKGROUND --- */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 20%, rgba(0, 70, 100, 0.35), transparent 70%),
+                linear-gradient(180deg, #022034, #001627 80%);
+    animation: waveAnim 12s ease-in-out infinite alternate;
+    z-index: -2;
+  }
+  @keyframes waveAnim {
+    0% { background-position: 0 0, 0 0; }
+    50% { background-position: 20px 30px, 0 20px; }
+    100% { background-position: -20px -20px, 0 -30px; }
+  }
+
+  /* --- HOVER EFFECTS FOR CONTENT CARDS --- */
+  .content-card {
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+  .content-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: rgba(255,208,107,0.4);
+    box-shadow: 0 20px 40px rgba(255, 208, 107, 0.2),
+                0 8px 20px rgba(0,0,0,0.4);
+  }
+/* ===== ensure containers don't clip lifted items ===== */
+.project-grid,
+.content-card,
+.card,
+main,
+.site {
+  overflow: visible !important; /* allow children to rise above siblings */
+}
+
+/* ===== project lift + z-index work reliably ===== */
+.project {
+  position: relative;                 /* allow z-index to take effect */
+  z-index: 1;                         /* baseline */
+  transform-origin: center top;       /* lift from the top for nicer effect */
+  will-change: transform, box-shadow; /* hint for smoother GPU animation */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 360ms cubic-bezier(.22,.9,.3,1),
+              box-shadow 360ms cubic-bezier(.22,.9,.3,1);
+  /* ensure transform from other rules doesn't override with higher specificity */
+}
+
+/* Hover: scale + slight upward translation + big z-index to sit above neighbors */
+.project:hover {
+  transform: translateY(-10px) scale(1.06);
+  z-index: 9999;                      /* bring above everything */
+  box-shadow: 0 16px 36px rgba(0,0,0,0.55);
+}
+
+/* If you want smoother stacking switch, ensure siblings are lower */
+.project-grid > .project { z-index: 1; }
+
+/* ===== Extra guard: if some ancestor has transform, push the hovered item out =====*/
+
+.project:hover {
+  position: relative;
+  transform: translateZ(999px) translateY(-10px) scale(1.06);
+}
+
+
+
+@media(max-width:900px){
+  #effectsToggle{
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    top: 80px;
+  }
+}
+
+
+/* 1) Smooth native scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 2) Tell anchors to stop short so fixed header won't cover content.
+   Use the header height variable so it's easy to tweak. */
+:root {
+  --header-height: 72px; /* adjust if your header is taller/shorter */
+}
+
+/* apply to section targets and major anchors */
+section, main, .content-card {
+  scroll-margin-top: calc(var(--header-height) + 14px);
+}
+
+/* 3) Entrance animation for sections (initially slightly down + faded) */
+.section-anim {
+  opacity: 0;
+  transform: translateY(18px) scale(0.995);
+  transition: opacity 560ms cubic-bezier(.22,.9,.3,1),
+              transform 560ms cubic-bezier(.22,.9,.3,1);
+  will-change: transform, opacity;
+}
+
+/* when in view, reveal */
+.section-anim.in-view {
+  opacity: 1;
+  transform: none;
+}
+
+/* optional: make nav focus visible after smooth scroll */
+:focus {
+  scroll-margin-top: calc(var(--header-height) + 14px);
+}
+
+</style>
+
+</style>
+</head>
+<body>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <div id="effectsToggle" title="Toggle effects">Effects: On</div>
+
+  <div class="site">
+    <header>
+      <nav class="nav" role="navigation" aria-label="Primary nav">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#education" class="nav-link">Education</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+    </header>
+
+    <main id="home" tabindex="-1">
+      <div class="left">
+        <h1 class="title">Hi — I'm <span style="color:var(--accent)">Jai Sudhan K</span></h1>
+        <p class="lead">A passionate Java Full Stack Developer with a knack for crafting robust back-end systems and engaging front-end experiences. I specialize in Java, Spring Boot, RESTful APIs, Hibernate, and SQL on the back-end, and bring ideas to life on the front-end using HTML, CSS, JavaScript, and modern frameworks. <br><br>
+        Beyond development, I love building real-world solutions—from an AI-powered smart attendance system with facial recognition to complete e-commerce platforms with seamless user experiences. <br><br>
+        I’m always exploring new technologies, solving complex problems, and striving to write clean, scalable, and efficient code. 🚀</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+         <a class="btn" href="#contact">Hire Me</a>
+         <a class="btn" href="#projects">See Projects</a>
+        </div>
+
+        <section id="about" aria-label="About">
+          <h3 style="color:var(--accent)">About</h3>
+          <div class="content-card" style="margin-top:.8rem">
+            <p>I’m <strong>Jai Sudhan</strong>, a BE Computer Science student (2022–2026) passionate about building full-stack web applications and crafting interactive, animation-driven user experiences. I specialize in Java, Spring Boot, React, and Node.js, with a focus on RESTful APIs, responsive UIs, and clean, maintainable code.<br><br> I enjoy turning complex problems into scalable, high-performance solutions while paying close attention to micro-interactions that make applications delightful to use. My experience spans secure authentication (JWT, Spring Security), database management (MySQL, MongoDB), and deployment on cloud platforms (AWS, Netlify, Vercel).<br><br> Beyond coding, I’m always exploring new technologies, contributing to collaborative projects, and refining my craft to deliver products that are not just functional, but also engaging and impactful.</p>
+            <p class="small" style="margin-top:.6rem">I focus on: REST APIs, responsive UI, animation-driven UX, and clean maintainable code.</p>
+          </div>
+        </section>
+      </div>
+
+      <aside class="right">
+        <div class="card">
+          <div style="display:flex;gap:.9rem;align-items:center">
+            <div style="width:64px;height:64px;border-radius:8px;overflow:hidden;flex:0 0 64px">
+              <img src="https://img.freepik.com/premium-vector/cartoon-boy-with-orange-background-anime-vector_1338461-476.jpg" alt="profile" style="width:100%;height:100%;object-fit:cover;display:block">
+            </div>
+            <div>
+              <div style="font-weight:800">Jai Sudhan K</div>
+              <div class="small">Java Full Stack • UI Animations • Secure Web Dev</div>
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap">
+     <a class="btn"
+   href="assets/Jai_Sudhan.pdf" target="_blank"
+   download="Jai_Sudhan_K_CV.pdf"
+   rel="noopener noreferrer"
+   aria-label="Download Jai Sudhan CV">
+   Download CV
+</a>
+            <a class="btn" href="#contact">Contact</a>
+      </div>
+
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div style="font-weight:700;margin-bottom:.4rem">Quick Projects</div>
+          <div class="small">
+            <ul style="margin:0;padding-left:1.1rem;">
+              <li>Real time Face Attendance - Prototype webcam attendance with face registration and a Flask/DB backend.</li><br>
+              <li>E-Commerce POC — Full-stack shopping platform using Spring Boot (REST APIs) + React frontend.</li><br>
+              <li>Freelance Marketplace — Full-stack freelance platform with project bidding, secure login, and payment integration.</li>
+            </ul>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <section id="education" aria-label="Education" style="margin-top:1.4rem">
+      <h3 style="color:var(--accent)">Education</h3>
+      <div class="content-card" style="margin-top:.8rem">
+        <div class="edu-list">
+          <div><strong>B.E. — Computer Science and Engineering</strong><br>Dhirajlal Gandhi College of Technology • 2022 — 2026</div>
+          <div><strong>Relevant Trainings</strong><br>Java Spring Boot, Frontend animation workshops, Git & DevOps basics</div>
+          <div><strong>Skills</strong><br>Java,Python, Spring Boot, REST APIs, Hibernate, SQL, JavaScript, React, Node.js, Canvas animations,Figma</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" aria-label="Projects" style="margin-top:1.4rem">
+      <h3 style="color:var(--accent)">Projects</h3>
+      <div class="content-card" style="margin-top:.8rem">
+        <div class="project-grid">
+         
+          <div class="project"><strong>E-commerce Website</strong><p class="small">A full-stack online shopping platform where users can browse products, add to cart, and place orders. Admins can manage inventory and view sales reports.</p><strong>Tools Used:</strong><ul><li>Frontend: HTML, CSS, JavaScript, React</li><li>Backend: Java, Spring Boot, REST APIs</li><li>Database: MySQL</li><li>Authentication: Spring Security</li></ul></div>
+          <div class="project"><strong>Freelance Marketplace Website</strong><p class="small">A platform that connects freelancers with clients. Freelancers can create profiles, showcase their skills, and bid on projects, while clients can post jobs, review proposals, and hire talent. The site also supports secure logins, project tracking, and payment workflow</p><strong>Tools Used:</strong><ul><li>Frontend: HTML, CSS, JavaScript, React</li><li>Backend: Java, Spring Boot (RESTful APIs)</li><li>Database: MySQL</li><li>Authentication: Spring Security</li></ul></div>
+          <div class="project"><strong>Face Attendance</strong><p class="small">A webcam-based attendance system with face recognition. Detects masks, logs in-time and out-time, and sends attendance reports via email.</p><strong>Tools Used:</strong><ul><li>Python, OpenCV, TensorFlow/Keras (for face detection & mask detection)</li><li>Flask (for web interface)</li><li>MySQL (for storing attendance data)</li><li>EmailJS (for sending reports)</li></ul></div>
+           <div class="project"><strong>Animated Portfolio </strong><p class="small">An animated personal website with unique wavy backgrounds, smooth section transitions, and integrated contact form.</p><strong>Tools Used:</strong><ul><li>HTML5</li><li>CSS3</li><li>JavaScript</li><li>EmailJS (contact form integration)</li></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" aria-label="Contact" style="margin-top:1.4rem">
+      <h3 style="color:var(--accent)">Contact</h3>
+      <div class="content-card" style="margin-top:.8rem">
+        <p class="small">Want to collaborate? Send a message</p>
+        <form id="contactForm" class="contact-form" onsubmit="return false;">
+          <input name="name" placeholder="Your name" required>
+          <input name="email" placeholder="Enter your mail" required>
+          <textarea name="message" placeholder="Hi! I want to build..." rows="4" required></textarea>
+          <div style="display:flex;gap:.6rem;align-items:center;margin-top:.4rem">
+            <button class="btn" id="sendBtn">Send</button>
+            <div id="status" style="color:#bfe9ff;font-weight:600"></div>
+          </div>
+        </form>
+        <p class="small" style="margin-top:.6rem">Email: <strong style="color:var(--accent)">jaisudhan1512@gmail.com</strong></p>
+        <p class="small" style="margin-top:.6rem">Phone No: <strong style="color:var(--accent)">+91 77082 27566</strong></p>
+      </div>
+    </section>
+
+    <footer style="text-align:center;margin-top:2rem;">
+      <div style="opacity:.9">© 2025 Jai Sudhan — All rights Reserved</div>
+    </footer>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+/* ============================
+  Canvas: waves, caustics, fish with tails
+  - Slower swim, natural turning
+  - Click -> fish swims to point, pauses briefly, then swims away
+  - Animated tail polygon
+  - Soft surface wave layer (sine) drawn at top
+  - Toggle effects control (#effectsToggle)
+============================ */
+
+(() => {
+  const canvas = document.getElementById('fx');
+  const ctx = canvas.getContext('2d', { alpha: true });
+  let W = innerWidth, H = innerHeight;
+  let DPR = Math.min(2, devicePixelRatio || 1);
+  let effectsOn = true;
+
+  function resize(){
+    W = innerWidth; H = innerHeight;
+    DPR = Math.min(2, devicePixelRatio || 1);
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent) || W < 900;
+
+  // helper
+  const rand = (a,b)=> a + Math.random()*(b-a);
+  const clamp = (v,a,b)=> Math.max(a, Math.min(b, v));
+  const lerp = (a,b,t)=> a + (b-a)*t;
+
+  /* CAUSTICS: small offscreen canvas for subtle moving patterns */
+  const caustic = document.createElement('canvas');
+  caustic.width = 512; caustic.height = 256;
+  const C = caustic.getContext('2d');
+
+  function updateCaustic(t){
+    const w = caustic.width, h = caustic.height;
+    C.clearRect(0,0,w,h);
+    // draw several ripple lines
+    for(let i=0;i<6;i++){
+      C.beginPath();
+      const amp = 6 + i*2;
+      const freq = 0.01 + i*0.002;
+      for(let x=0;x<w;x+=4){
+        const y = h/2 + Math.sin((x*freq) + t*0.0006*(1+i*0.4)) * (amp * (0.8 + Math.sin(i+t*0.00012)));
+        if(x===0) C.moveTo(x,y); else C.lineTo(x,y);
+      }
+      C.strokeStyle = `rgba(255,255,240,${0.02 - i*0.002})`;
+      C.lineWidth = 1.2;
+      C.stroke();
+    }
+  }
+
+  function drawCaustic(){
+    ctx.save();
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.globalAlpha = isMobile ? 0.18 : 0.36;
+    const s = Math.max(1, W/900);
+    ctx.drawImage(caustic, -60, H*0.06, caustic.width*s*1.8, caustic.height*s*1.8);
+    ctx.restore();
+  }
+
+  /* Surface waves (soft sine-based) */
+  function drawSurfaceWaves(t){
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = '#052a37';
+    // gentle top band
+    ctx.fillRect(0,0,W, H*0.12);
+    // wave curves
+    ctx.beginPath();
+    const layers = 3;
+    for(let l=0;l<layers;l++){
+      const offsetY = 38 + l*8;
+      const amp = 8 + l*6;
+      ctx.moveTo(0, offsetY);
+      for(let x=0;x<=W;x+=12){
+        const y = offsetY + Math.sin((x*0.012) + t*0.0006*(0.6 + l*0.35)) * amp;
+        ctx.lineTo(x, y);
+      }
+    }
+    ctx.strokeStyle = 'rgba(180,240,255,0.035)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* Particles (tiny drifting) */
+  const particles = [];
+  const PCOUNT = isMobile ? 60 : 160;
+  function makeParticle(){
+    return {
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: Math.random()*1.6 + 0.6,
+      vy: -(0.05 + Math.random()*0.3),
+      alpha: 0.02 + Math.random()*0.12,
+      swing: Math.random()*0.9+0.1
+    };
+  }
+  function initParticles(){
+    particles.length = 0;
+    for(let i=0;i<PCOUNT;i++) particles.push(makeParticle());
+  }
+  initParticles();
+
+  /* Fish: multiple species with tails */
+  class Fish {
+    constructor(opts = {}){
+      this.size = opts.size || rand(34, 86);
+      // color hue give variety
+      this.h = opts.h || rand(10, 200);
+      this.color = `hsl(${this.h}, 72%, ${rand(48,64)}%)`;
+      this.x = opts.x !== undefined ? opts.x : rand(-200, W+200);
+      this.y = opts.y !== undefined ? opts.y : rand(80, H-120);
+      this.vx = (Math.random()>0.5?1:-1) * rand(8, 32) * (isMobile ? 0.6 : 0.9); // slower base speed
+      this.vy = rand(-6,6)*0.08;
+      this.tailPhase = Math.random()*Math.PI*2;
+      this.tailSpeed = rand(0.9,1.6); // wag speed multiplier
+      this.tailW = opts.tailW || rand(0.28, 0.52); // tail width factor
+      this.state = 'swim'; // 'swim'|'toTarget'|'pause'
+      this.target = null;
+      this.arriveTimer = 0;
+      this.maxSpeed = Math.abs(this.vx) * 1.4;
+      this.id = Math.random().toString(36).slice(2,8);
+    }
+
+    setTarget(tx, ty){
+      this.target = { x: tx, y: ty };
+      this.state = 'toTarget';
+      this.arriveTimer = 0;
+    }
+
+    update(dt){
+      this.tailPhase += dt * 0.008 * this.tailSpeed;
+
+      if(this.state === 'toTarget' && this.target){
+        const dx = this.target.x - this.x;
+        const dy = this.target.y - this.y;
+        const dist = Math.hypot(dx,dy) || 1;
+        // steering toward target with smooth turning
+        const desiredVx = (dx/dist) * this.maxSpeed;
+        const desiredVy = (dy/dist) * this.maxSpeed;
+        this.vx = lerp(this.vx, desiredVx, 0.045);
+        this.vy = lerp(this.vy, desiredVy, 0.045);
+
+        if(dist < 36){
+          // pause briefly but then swim away (do not settle on bottom)
+          this.arriveTimer += dt;
+          this.vx *= 0.95; this.vy *= 0.95;
+          if(this.arriveTimer > 650){
+            this.state = 'pause';
+            this.target = null;
+            // pick an outward direction to swim away after pause
+            setTimeout(() => {
+              // choose a random safe heading (avoid bottom)
+              const angle = rand(-Math.PI*0.6, Math.PI*0.6);
+              const speed = rand(this.maxSpeed*0.6, this.maxSpeed);
+              this.vx = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
+              this.vy = Math.sin(angle) * speed * 0.6;
+              this.state = 'swim';
+            }, 700 + Math.random()*800);
+          }
+        }
+      } else {
+        // gentle wandering: oscillatory steering
+        const wobbleX = Math.sin(this.tailPhase*0.25 + this.id.length) * 0.08;
+        const wobbleY = Math.cos(this.tailPhase*0.2) * 0.06;
+        this.vx += wobbleX;
+        this.vy += wobbleY;
+        // limit speed
+        const s = Math.hypot(this.vx, this.vy);
+        if(s > this.maxSpeed) { this.vx *= 0.985; this.vy *= 0.985; }
+      }
+
+      // update position scaled to dt for consistent speed
+      const scale = dt * 0.03;
+      this.x += this.vx * scale;
+      this.y += this.vy * scale;
+
+      // wrap horizontally
+      if(this.x < -260) this.x = W + 120;
+      if(this.x > W + 260) this.x = -120;
+      // clamp vertical but avoid bottom settling
+      const margin = 40;
+      this.y = clamp(this.y, margin, H - margin - (isMobile ? 40 : 20));
+    }
+
+    draw(ctx){
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      const dir = this.vx >= 0 ? 1 : -1;
+      ctx.scale(dir, 1);
+
+      // depth shading by y: deeper => darker
+      const depthTint = clamp(1 - (this.y / H) * 0.5, 0.6, 1);
+
+      // body
+      const L = this.size;
+      const Ht = this.size * 0.52;
+      const grad = ctx.createLinearGradient(-L*0.25, -Ht*0.25, L*0.55, Ht*0.55);
+      // color variations
+      grad.addColorStop(0, this.color);
+      grad.addColorStop(1, `rgba(255,235,180,${0.8 * depthTint})`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, L*0.46, Ht*0.5, 0, 0, Math.PI*2);
+      ctx.fill();
+
+      // tail (animated triangle that wags)
+      const tailW = L * this.tailW;
+      const tailH = Ht * 0.64;
+      const wag = Math.sin(this.tailPhase * 2.1) * (8 + (L/20)) * (1 - this.tailW*0.4);
+
+      ctx.beginPath();
+      ctx.moveTo(-L*0.46, 0);
+      ctx.quadraticCurveTo(-L*0.46 - tailW + wag*0.18, -tailH + wag*0.26, -L*0.46 - tailW + wag*0.18, -tailH);
+      ctx.lineTo(-L*0.46 - tailW - wag*0.12, tailH);
+      ctx.quadraticCurveTo(-L*0.46 - tailW + wag*0.18, tailH + wag*0.24, -L*0.46, 0);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(230,150,75,${0.95 * depthTint})`;
+      ctx.fill();
+
+      // small stripes or spots for variety
+      ctx.fillStyle = `rgba(0,10,10,${0.18})`;
+      if(Math.random() > 0.6){
+        ctx.beginPath();
+        ctx.ellipse(L*0.02, -Ht*0.02, L*0.12, Ht*0.06, 0, 0, Math.PI*2);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(-L*0.02, -Ht*0.2);
+        ctx.quadraticCurveTo(L*0.08, 0, -L*0.02, Ht*0.2);
+        ctx.lineWidth = Math.max(1, L*0.02);
+        ctx.strokeStyle = 'rgba(0,10,12,0.12)';
+        ctx.stroke();
+      }
+
+      // eye
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(6,10,12,0.95)';
+      ctx.arc(L*0.18, -Ht*0.08, Math.max(2.4, L*0.052), 0, Math.PI*2);
+      ctx.fill();
+
+      // subtle highlight
+      ctx.beginPath();
+      ctx.ellipse(L*0.02, -Ht*0.02, L*0.16, Ht*0.08, 0, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  // fish collection
+  const fishes = [];
+  function initFish(){
+    fishes.length = 0;
+    const count = isMobile ? 7 : 14;
+    for(let i=0;i<count;i++){
+      fishes.push(new Fish());
+    }
+  }
+  initFish();
+
+  // bubble bursts for click feedback (simple particles drawn directly)
+  const bursts = [];
+
+  function bubbleBurst(x,y,n=10){
+    for(let i=0;i<n;i++){
+      bursts.push({
+        x,y,
+        vx: rand(-1.6,1.6),
+        vy: rand(-2.8, -0.6),
+        r: rand(2,7),
+        life: rand(700,1400),
+        t:0
+      });
+    }
+  }
+
+  // main loop
+  let last = performance.now();
+  function loop(now){
+    const dt = now - last; last = now;
+    // clear
+    ctx.clearRect(0,0,W,H);
+
+    // deep gradient background
+    const bg = ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0, '#043844');
+    bg.addColorStop(0.45, '#032f36');
+    bg.addColorStop(1, '#011820');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,W,H);
+
+    // surface waves & caustics
+    drawSurfaceWaves(now);
+    updateCaustic(now);
+    drawCaustic();
+
+    // particles (tiny drifting)
+    for(let i=0;i<particles.length;i++){
+      const p = particles[i];
+      p.y += p.vy * (dt * 0.06);
+      p.x += Math.sin(now*0.001 + i*p.swing) * 0.28;
+      if(p.y < -20){ particles[i] = makeParticle(); particles[i].y = H + rand(20,120); }
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(220,255,255,0.06)';
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // fish update & draw
+    for(const f of fishes) f.update(dt);
+    // sort by y for simple depth ordering
+    fishes.sort((a,b)=> a.y - b.y);
+    for(const f of fishes) f.draw(ctx);
+
+    // draw bubble bursts
+    for(let i=bursts.length-1;i>=0;i--){
+      const b = bursts[i];
+      b.t += dt;
+      b.x += b.vx * (dt * 0.04);
+      b.y += b.vy * (dt * 0.04);
+      const p = 1 - (b.t / b.life);
+      if(p <= 0){ bursts.splice(i,1); continue; }
+      ctx.globalAlpha = clamp(p,0,1) * 0.9;
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(210,245,255,${0.18 * p})`;
+      ctx.arc(b.x, b.y, b.r * (1 + (1-p)*0.9), 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // click handling: fish swims to click / nav buttons attached
+  function spawnToRect(rect){
+    if(!effectsOn) return;
+    const rx = rect.left + window.scrollX + rect.width/2;
+    const ry = rect.top + window.scrollY + rect.height/2;
+    // pick nearest fish that is not currently "toTarget"
+    let best = Infinity, chosen = null;
+    for(const f of fishes){
+      if(f.state !== 'toTarget'){
+        const d = Math.hypot(f.x - rx, f.y - ry);
+        if(d < best){ best = d; chosen = f; }
+      }
+    }
+    if(chosen){
+      chosen.setTarget(rx, ry);
+    } else {
+      // spawn temporary fish that will arrive and then swim away
+      const temp = new Fish({ x: rand(0,W), y: rand(60, H-100) });
+      temp.setTarget(rx, ry);
+      fishes.push(temp);
+      // schedule removal later so we don't build infinite list
+      setTimeout(()=> {
+        const idx = fishes.indexOf(temp);
+        if(idx >=0) fishes.splice(idx,1);
+      }, 20000);
+    }
+    bubbleBurst(rx, ry, 10);
+  }
+
+  // attach to nav and buttons
+  document.querySelectorAll('.nav-link, .btn, a[href^="#"]').forEach(el=>{
+    el.addEventListener('click', (ev)=>{
+      const rect = el.getBoundingClientRect();
+      spawnToRect(rect);
+    });
+  });
+
+  // page clicks
+  document.addEventListener('click', (ev)=>{
+    // ignore clicks on inputs/forms/buttons (they already have handlers)
+    if(['INPUT','TEXTAREA','BUTTON','A'].includes(ev.target.tagName)) return;
+    spawnToRect({ left: ev.clientX - 20, top: ev.clientY - 14, width: 40, height: 28 });
+  });
+
+  // bubbles helper (used by spawn)
+  function bubbleBurst(x,y,n=8){
+    for(let i=0;i<n;i++){
+      bursts.push({
+        x, y,
+        vx: rand(-1.4,1.4),
+        vy: rand(-2.4, -0.6),
+        r: rand(2,6),
+        life: rand(600,1200),
+        t:0
+      });
+    }
+  }
+
+  // demo contact send fish & bubble
+  document.getElementById('sendBtn').addEventListener('click', ()=>{
+    const rect = document.getElementById('contact').getBoundingClientRect();
+    spawnToRect(rect);
+    document.getElementById('status').textContent = 'sending...';
+  });
+
+  // Effects toggle
+  const toggle = document.getElementById('effectsToggle');
+  toggle.addEventListener('click', ()=>{
+    effectsOn = !effectsOn;
+    toggle.textContent = `Effects: ${effectsOn ? 'On' : 'Off'}`;
+    // fade out canvas when off
+    canvas.style.opacity = effectsOn ? '1' : '0.08';
+  });
+
+  // helper to create particles at various times (reused)
+  function makeParticle(){ return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.6 + 0.6, vy: -(0.05 + Math.random()*0.3), alpha: 0.02 + Math.random()*0.12, swing: Math.random()*0.9+0.1 }; }
+
+  // small periodic addition of fish if count low (keeps life)
+  setInterval(()=> {
+    if(!effectsOn) return;
+    if(fishes.length < (isMobile?6:12) && Math.random() < 0.45){
+      fishes.push(new Fish());
+    }
+  }, 5200);
+
+})();
+
+// Smooth-scroll with header offset + IntersectionObserver reveal
+(function(){
+  // header size detection (keeps it responsive on resize)
+  function headerHeight(){
+    const hdr = document.querySelector('header');
+    return hdr ? Math.round(hdr.getBoundingClientRect().height) : 72;
+  }
+
+  // 1) Intercept anchor clicks to ensure consistent offset across browsers
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', function(e){
+      const targetId = this.getAttribute('href').slice(1);
+      if(!targetId) return;
+      const target = document.getElementById(targetId);
+      if(!target) return;
+      e.preventDefault();
+
+      const top = target.getBoundingClientRect().top + window.scrollY;
+      const offset = headerHeight() + 12; // extra breathing room
+      // use smooth scroll to computed position
+      window.scrollTo({ top: top - offset, behavior: 'smooth' });
+
+      // For keyboard / a11y: move focus nicely
+      target.setAttribute('tabindex','-1');
+      target.focus({ preventScroll: true });
+      // optionally remove tabindex later
+      window.setTimeout(()=> target.removeAttribute('tabindex'), 1200);
+    });
+  });
+
+  // 2) IntersectionObserver to add "in-view" class and animate sections
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(ent=>{
+      if(ent.isIntersecting){
+        ent.target.classList.add('in-view');
+        // if you want animation only once, unobserve
+        io.unobserve(ent.target);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: `-${Math.max(0, headerHeight() - 8)}px 0px -12% 0px`, // start a bit earlier
+    threshold: 0.12
+  });
+
+  // Attach .section-anim to major sections (so you won't break small card animations)
+  document.querySelectorAll('section, main, .content-card, .project').forEach(el=>{
+    // avoid double-adding if present already
+    if(!el.classList.contains('section-anim')) el.classList.add('section-anim');
+    io.observe(el);
+  });
+
+  // Update observer on resize (important if header size changes)
+  let resizeTimer;
+  window.addEventListener('resize', ()=> {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(()=> {
+      // Recreate observer with updated rootMargin
+      io.disconnect();
+      // create new observer with updated header height
+      const newIO = new IntersectionObserver((entries)=>{
+        entries.forEach(ent=>{
+          if(ent.isIntersecting){
+            ent.target.classList.add('in-view');
+            newIO.unobserve(ent.target);
+          }
+        });
+      }, {
+        root: null,
+        rootMargin: `-${Math.max(0, headerHeight() - 8)}px 0px -12% 0px`,
+        threshold: 0.12
+      });
+      document.querySelectorAll('.section-anim').forEach(e => newIO.observe(e));
+    }, 120);
+  });
+
+})();
+
+
+
+<!-- EmailJS -->
+
+emailjs.init("lrHrEss7SOc_syX3V");
+
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const status = document.getElementById('status');
+  const formData = {
+    from_name: this.name.value,
+    from_email: this.email.value,
+    message: this.message.value
+  };
+  emailjs.send('service_uf2c60t','template_6pzzehi', formData)
+    .then(() => {
+      status.textContent = "Message sent successfully!";
+      this.reset();
+    }, (err) => {
+      console.error(err);
+      status.textContent = "Oops, something went wrong...";
+    });
+});
+
+</script>
+
+
+</script>
+
+</body>
+</html>
